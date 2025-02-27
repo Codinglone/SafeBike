@@ -1,7 +1,7 @@
 require("dotenv").config();
 import "reflect-metadata";
 import { DataSource } from "typeorm";
-import { User } from "./entity/User";
+import { Passenger } from "./entity/Passenger";
 
 const dbURL = "";
 export const AppDataSource = new DataSource(
@@ -11,7 +11,7 @@ export const AppDataSource = new DataSource(
         url: dbURL,
         synchronize: true,
         logging: false,
-        entities: [User],
+        entities: [Passenger],
         migrations: [],
         subscribers: [],
       }
@@ -24,7 +24,7 @@ export const AppDataSource = new DataSource(
         database: process.env.DB_NAME,
         synchronize: true,
         logging: false,
-        entities: [User],
+        entities: [Passenger],
         migrations: [],
         subscribers: [],
       }
