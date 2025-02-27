@@ -8,7 +8,7 @@ export const AppDataSource = new DataSource(
   process.env.NODE_ENV === "production"
     ? {
         type: "postgres",
-        url: dbURL,
+        url: "postgresql://safebike_rwanda_db_user:K35GyKnGn9rfYm570k0xasiE5SsMhcWq@dpg-cv0302lumphs73cg7fq0-a/safebike_rwanda_db",
         synchronize: true,
         logging: true,
         entities: [Passenger],
