@@ -53,6 +53,7 @@ app.register(require("@fastify/cors"), {
 });
 
 app.register(require("./routes/welcome.routes"), { prefix: "" });
+app.register(require("./routes/auth/auth.routes"), { prefix: "/api/v1" });
 
 const start = async () => {
   try {
@@ -64,6 +65,7 @@ const start = async () => {
     connectDB();
   } catch (err) {
     app.log.error(err);
+    console.log(err);
     process.exit(1);
   }
 };

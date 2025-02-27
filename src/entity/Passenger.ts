@@ -23,6 +23,6 @@ export class Passenger {
     @Column()
     phoneNumber: string
 
-    @CreateDateColumn()
-    createdAt: string
+    @CreateDateColumn({ type: Date })
+    createdAt: Date
 }
