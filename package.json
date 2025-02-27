@@ -1,0 +1,30 @@
+{
+   "name": "SafeBike",
+   "version": "0.0.1",
+   "description": "Awesome project developed with TypeORM.",
+   "type": "commonjs",
+   "devDependencies": {
+      "@types/node": "^16.11.10",
+      "ts-node": "10.9.1",
+      "typescript": "4.5.2"
+   },
+   "dependencies": {
+      "@fastify/cors": "^11.0.0",
+      "@fastify/swagger": "^9.4.2",
+      "@sinclair/typebox": "^0.34.28",
+      "bcrypt": "^5.1.1",
+      "cross-env": "^7.0.3",
+      "dotenv": "^16.4.7",
+      "fastify": "^5.2.1",
+      "jsonwebtoken": "^9.0.2",
+      "nodemon": "^3.1.9",
+      "pg": "^8.4.0",
+      "reflect-metadata": "^0.1.13",
+      "typeorm": "0.3.20"
+   },
+   "scripts": {
+      "start": "cross-env NODE_ENV=production ts-node src/index.ts",
+      "dev": "cross-env NODE_ENV=development nodemon src/index.ts",
+      "typeorm": "typeorm-ts-node-commonjs"
+   }
+}
