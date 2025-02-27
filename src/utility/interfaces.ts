@@ -7,3 +7,13 @@ export interface PassengerAccountCreationType {
     ResidencyAddress: string;
     phoneNumber: string;
 }
+
+export interface RiderAccountCreationType {
+    firstName: string;
+    lastName: string;
+    email: string;
+    plateNumber: string;
+    password: string;
+    ResidencyAddress: string;
+    phoneNumber: string;
+}
