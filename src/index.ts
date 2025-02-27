@@ -64,6 +64,7 @@ const start = async () => {
     connectDB();
   } catch (err) {
     app.log.error(err);
+    console.log(err);
     process.exit(1);
   }
 };
