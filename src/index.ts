@@ -53,6 +53,7 @@ app.register(require("@fastify/cors"), {
 });
 
 app.register(require("./routes/welcome.routes"), { prefix: "" });
+app.register(require("./routes/auth/auth.routes"), { prefix: "/api/v1" });
 
 const start = async () => {
   try {
