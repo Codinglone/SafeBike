@@ -2,6 +2,7 @@ require("dotenv").config();
 import "reflect-metadata";
 import { DataSource } from "typeorm";
 import { Passenger } from "./entity/Passenger";
+import { Rider } from "./entity/Rider";
 
 const dbURL = process.env.EXTERNAL_PRODUCTION_DB;
 export const AppDataSource = new DataSource(
@@ -11,7 +12,7 @@ export const AppDataSource = new DataSource(
         url: "postgresql://safebike_rwanda_db_user:K35GyKnGn9rfYm570k0xasiE5SsMhcWq@dpg-cv0302lumphs73cg7fq0-a/safebike_rwanda_db",
         synchronize: true,
         logging: true,
-        entities: [Passenger],
+        entities: [Passenger, Rider],
         migrations: [],
         subscribers: [],
       }
@@ -24,7 +25,7 @@ export const AppDataSource = new DataSource(
         database: process.env.DB_NAME,
         synchronize: true,
         logging: false,
-        entities: [Passenger],
+        entities: [Passenger, Rider],
         migrations: [],
         subscribers: [],
       }
