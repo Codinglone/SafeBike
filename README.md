@@ -52,3 +52,58 @@ SafeBike is a revolutionary API that connects passengers who need to send packag
 ```bash
 git clone https://github.com/your-username/safebike-rwanda.git
 cd safebike-rwanda
+
+2. **Install dependencies**
+
+```bash
+npm install
+
+3. **Set up environment variables**
+
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=your_db_user
+DB_PASSWORD=your_db_password
+DB_NAME=safebike
+PORT=5000
+JWT_SECRET=your_jwt_secret
+NODE_ENV=development
+
+4. **Start the server**
+
+# Development mode
+npm run dev
+
+# Production mode
+npm run build
+npm start
+
+# 📝 API Documentation
+http://localhost:5000/api-docs
+
+# 🔄 Workflow
+
+1. 👤 Passenger creates an account
+2. 🏍️ Rider creates an account
+3. 📦 Passenger creates a package delivery request
+4. 🔍 Rider accepts package delivery
+5. 🚚 Rider confirms pickup
+6. 🏁 Rider marks delivery as completed
+7. ✅ Recipient confirms package receipt
+
+# 🧪 Testing
+
+# Run tests
+npm test
+
+# Run tests with coverage
+npm run test:coverage
+
+📄 License
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+📞 Contact
+For any inquiries, please reach out to:
+
+Email: info@safebike.rw
+Twitter: @SafeBikeRwanda
