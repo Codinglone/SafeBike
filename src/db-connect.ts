@@ -1,14 +1,19 @@
 import { AppDataSource } from "./data-source";
-export const connectDB = async (retries = 10) => {
-  while (retries) {
-    try {
-      await AppDataSource.initialize();
-      break;
-    } catch (err) {
-      console.log(err);
-      retries -= 1;
-      console.log(`Retries left: ${retries}`);
-      await ((res) => setTimeout(res, 5000));
+
+export const connectDB = async (retries = 5) => {
+    while (retries) {
+        try {
+            await AppDataSource.initialize();
+            console.log("Data Source has been initialized!");
+            break;
+        } catch (err) {
+            console.error("Error during Data Source initialization:", err);
+            retries -= 1;
+            console.log(`Retries left: ${retries}`);
+            if (retries === 0) {
+                throw new Error("Failed to connect to database");
+            }
+            await new Promise(resolve => setTimeout(resolve, 5000));
+        }
     }
-  }
 };
