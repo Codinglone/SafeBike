@@ -8,6 +8,7 @@ export enum PackageStatus {
     PICKED_UP = "picked_up",   
     IN_TRANSIT = "in_transit",
     DELIVERED = "delivered",
+    CONFIRMED = "confirmed",
     CANCELLED = "cancelled"
 }
 
@@ -19,6 +20,10 @@ export class Package {
     @ManyToOne(() => Passenger)
     @JoinColumn()
     sender: Passenger;
+
+    @ManyToOne(() => Passenger)
+    @JoinColumn()
+    recipient: Passenger;
 
     @ManyToOne(() => Rider, { nullable: true })
     @JoinColumn()
@@ -60,4 +65,7 @@ export class Package {
 
     @Column({ type: "timestamp", nullable: true })
     deliveredAt: Date;
+
+    @Column({ type: "timestamp", nullable: true })
+    confirmedAt: Date;
 }

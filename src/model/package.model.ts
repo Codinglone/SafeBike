@@ -16,15 +16,26 @@ export class PackageAPI {
             throw new Error("Sender not found");
         }
 
+        const recipient = await passengerRepository.findOne({ 
+            where: { email: payload.recipientEmail } 
+        });
+
+        if (!recipient) {
+            throw new Error("Recipient not found - they must be registered in the system");
+        }
+
         // Create new package
         const newPackage = packageRepository.create({
             ...payload,
             sender,
+            recipient,
             status: PackageStatus.PENDING
         });
 
         return packageRepository.save(newPackage) as unknown as Promise<Package>;
     }
+
+    
 
     static async updatePackageStatus(
         packageId: number, 
@@ -66,7 +77,7 @@ export class PackageAPI {
         const packageRepository = AppDataSource.getRepository(Package);
         const packageToDeliver = await packageRepository.findOne({
             where: { id: packageId },
-            relations: ['sender', 'rider']
+            relations: ['sender', 'recipient', 'rider']
         });
 
         if (!packageToDeliver) {
@@ -154,7 +165,7 @@ export class PackageAPI {
         return packageRepository.save(packageToConfirm);
     }
 
-    static async confirmDelivery(packageId: number, recipientId: number): Promise<Package> {
+    static async confirmDelivery(packageId: number, riderId: number): Promise<Package> {
         const packageRepository = AppDataSource.getRepository(Package);
         
         const packageToDeliver = await packageRepository.findOne({
@@ -174,5 +185,31 @@ export class PackageAPI {
         packageToDeliver.deliveredAt = new Date();
     
         return packageRepository.save(packageToDeliver);
+    }
+
+    static async confirmReceipt(packageId: number, recipientId: number): Promise<Package> {
+        const packageRepository = AppDataSource.getRepository(Package);
+        
+        const packageToConfirm = await packageRepository.findOne({
+            where: { 
+                id: packageId,
+                status: PackageStatus.DELIVERED
+            },
+            relations: ['recipient', 'rider', 'sender']
+        });
+    
+        if (!packageToConfirm) {
+            throw new Error("Package not found or not delivered yet");
+        }
+
+        // Verify this is actually the recipient confirming
+        if (packageToConfirm.recipient.id !== recipientId) {
+            throw new Error("Only the designated recipient can confirm package receipt");
+        }
+    
+        packageToConfirm.status = PackageStatus.CONFIRMED;
+        packageToConfirm.confirmedAt = new Date();
+    
+        return packageRepository.save(packageToConfirm);
     }
 }
