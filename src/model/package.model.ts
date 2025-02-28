@@ -131,4 +131,48 @@ export class PackageAPI {
             relations: ['sender']
         });
     }
+
+    static async confirmPickup(packageId: number, riderId: number): Promise<Package> {
+        const packageRepository = AppDataSource.getRepository(Package);
+        
+        const packageToConfirm = await packageRepository.findOne({
+            where: { 
+                id: packageId,
+                rider: { id: riderId },
+                status: PackageStatus.ACCEPTED
+            },
+            relations: ['rider']
+        });
+    
+        if (!packageToConfirm) {
+            throw new Error("Package not found or not assigned to this rider");
+        }
+    
+        packageToConfirm.status = PackageStatus.PICKED_UP;
+        packageToConfirm.pickedUpAt = new Date();
+    
+        return packageRepository.save(packageToConfirm);
+    }
+
+    static async confirmDelivery(packageId: number, recipientId: number): Promise<Package> {
+        const packageRepository = AppDataSource.getRepository(Package);
+        
+        const packageToDeliver = await packageRepository.findOne({
+            where: { 
+                id: packageId,
+                status: PackageStatus.PICKED_UP
+            },
+            relations: ['rider']
+        });
+    
+        if (!packageToDeliver) {
+            throw new Error("Package not found or not picked up");
+        }
+    
+        // Here you can add logic to verify the recipient, e.g., check recipient ID
+        packageToDeliver.status = PackageStatus.DELIVERED;
+        packageToDeliver.deliveredAt = new Date();
+    
+        return packageRepository.save(packageToDeliver);
+    }
 }

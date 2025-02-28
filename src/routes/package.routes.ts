@@ -1,4 +1,4 @@
-import { createPackageOpts, updatePackageStatusOpts, getPackageOpts, getRiderPackagesOpts, assignPackageOpts } from "../schema/package.schema";
+import { createPackageOpts, updatePackageStatusOpts, getPackageOpts, getRiderPackagesOpts, assignPackageOpts, confirmPickupOpts, confirmDeliveryOpts } from "../schema/package.schema";
 import { safeBikeRoutes } from "../utility/enums";
 import { authenticateToken } from "../middleware/auth.middleware";
 
@@ -10,7 +10,8 @@ const PackageRoutes = (fastify, options, done) => {
     fastify.get(safeBikeRoutes.GET_PACKAGE, getPackageOpts);
     fastify.get(safeBikeRoutes.GET_RIDER_PACKAGES, getRiderPackagesOpts);
     fastify.post('/packages/:packageId/assign', assignPackageOpts);
-    
+    fastify.post('/packages/:packageId/pickup', confirmPickupOpts);
+    fastify.post('/packages/:packageId/deliver', confirmDeliveryOpts);
     done();
 };
 

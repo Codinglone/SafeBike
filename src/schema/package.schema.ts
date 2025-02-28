@@ -1,6 +1,6 @@
 import { Type as T } from "@sinclair/typebox";
 import { PackageStatus } from "../entity/Package";
-import { createPackageController, updatePackageStatusController, getPackageController, getRiderPackagesController, assignPackageController } from "../controller/package.controller";
+import { createPackageController, updatePackageStatusController, getPackageController, getRiderPackagesController, assignPackageController, confirmPickupController, confirmDeliveryController } from "../controller/package.controller";
 
 export const createPackageSchema = T.Object({
     recipientName: T.String({ description: 'Name of the package recipient' }),
@@ -132,4 +132,46 @@ export const assignPackageOpts = {
         }
     },
     handler: assignPackageController
+};
+
+export const confirmPickupOpts = {
+    schema: {
+        tags: ['packages'],
+        description: 'Confirm package pickup by rider',
+        params: T.Object({
+            packageId: T.String()
+        }),
+        response: {
+            200: T.Object({
+                message: T.String(),
+                data: T.Object({
+                    id: T.Number(),
+                    status: T.Enum(PackageStatus),
+                    pickedUpAt: T.String()
+                })
+            })
+        }
+    },
+    handler: confirmPickupController
+};
+
+export const confirmDeliveryOpts = {
+    schema: {
+        tags: ['packages'],
+        description: 'Confirm package delivery by recipient',
+        params: T.Object({
+            packageId: T.String()
+        }),
+        response: {
+            200: T.Object({
+                message: T.String(),
+                data: T.Object({
+                    id: T.Number(),
+                    status: T.Enum(PackageStatus),
+                    deliveredAt: T.String()
+                })
+            })
+        }
+    },
+    handler: confirmDeliveryController
 };

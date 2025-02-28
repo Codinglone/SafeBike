@@ -117,3 +117,45 @@ export const getAvailablePackagesController = async (request: AuthenticatedReque
         reply.code(400).send({ error: err.message });
     }
 };
+
+export const confirmPickupController = async (
+    request: FastifyRequest<{
+        Params: { packageId: string };
+    }> & AuthenticatedRequest,
+    reply: FastifyReply
+) => {
+    try {
+        const { packageId } = request.params;
+        const riderId = request.user.id; // Assuming the rider is logged in
+
+        const response = await PackageAPI.confirmPickup(parseInt(packageId), riderId);
+        
+        reply.code(200).send({
+            message: "Package pickup confirmed",
+            data: response
+        });
+    } catch (err) {
+        reply.code(400).send({ error: err.message });
+    }
+};
+
+export const confirmDeliveryController = async (
+    request: FastifyRequest<{
+        Params: { packageId: string };
+    }> & AuthenticatedRequest,
+    reply: FastifyReply
+) => {
+    try {
+        const { packageId } = request.params;
+        const recipientId = request.user.id;
+
+        const response = await PackageAPI.confirmDelivery(parseInt(packageId), recipientId);
+        
+        reply.code(200).send({
+            message: "Package delivery confirmed",
+            data: response
+        });
+    } catch (err) {
+        reply.code(400).send({ error: err.message });
+    }
+};
