@@ -146,16 +146,58 @@ export const confirmDeliveryController = async (
     reply: FastifyReply
 ) => {
     try {
-        const { packageId } = request.params;
-        const recipientId = request.user.id;
+        // Check if the user is a rider
+        if (!request.user || request.user.userType !== 'rider') {
+            return reply.code(403).send({ 
+                error: "Only riders can mark packages as delivered"
+            });
+        }
 
-        const response = await PackageAPI.confirmDelivery(parseInt(packageId), recipientId);
+        const { packageId } = request.params;
+        const riderId = request.user.id;
+
+        const response = await PackageAPI.confirmDelivery(
+            parseInt(packageId),
+            riderId
+        );
         
         reply.code(200).send({
-            message: "Package delivery confirmed",
+            message: "Package marked as delivered successfully",
             data: response
         });
     } catch (err) {
         reply.code(400).send({ error: err.message });
     }
 };
+
+export const confirmDeliveryReceiptController = async (
+    request: FastifyRequest<{
+        Params: { packageId: string };
+    }> & AuthenticatedRequest,
+    reply: FastifyReply
+) => {
+    try {
+        // Check if the user is a passenger
+        if (!request.user || request.user.userType !== 'passenger') {
+            return reply.code(403).send({ 
+                error: "Only passengers can confirm package receipt"
+            });
+        }
+
+        const { packageId } = request.params;
+        const recipientId = request.user.id;
+
+        const response = await PackageAPI.confirmReceipt(
+            parseInt(packageId), 
+            recipientId
+        );
+        
+        reply.code(200).send({
+            message: "Package receipt confirmed successfully",
+            data: response
+        });
+    } catch (err) {
+        reply.code(400).send({ error: err.message });
+    }
+};
+
