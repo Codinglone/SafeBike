@@ -98,14 +98,15 @@ http://localhost:5000/api-docs
 7. ✅ Recipient confirms package receipt
 
 # 🧪 Testing
-
-# Run tests
 ```
+# Run tests
+
 npm test
+```
 
 # Run tests with coverage
-npm run test:coverage
 ```
+npm run test:coverage
 
 
 📄 License
