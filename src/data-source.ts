@@ -3,6 +3,7 @@ import "reflect-metadata";
 import { DataSource } from "typeorm";
 import { Passenger } from "./entity/Passenger";
 import { Rider } from "./entity/Rider";
+import { Package } from "./entity/Package";
 
 export const AppDataSource = new DataSource({
   type: "postgres",
@@ -27,7 +28,7 @@ export const AppDataSource = new DataSource({
       }),
   synchronize: true,
   logging: process.env.NODE_ENV === "development",
-  entities: [Passenger, Rider],
+  entities: [Passenger, Rider, Package],
   migrations: [],
   subscribers: []
 });

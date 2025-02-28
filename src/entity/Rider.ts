@@ -26,6 +26,15 @@ export class Rider {
     @Column()
     phoneNumber: string
 
+    @Column({ default: false })
+    isAvailable: boolean;
+
+    @Column({ type: 'point', nullable: true })
+    currentLocation: string;
+
+    @Column({ type: 'timestamp', nullable: true })
+    lastLocationUpdate: Date;
+
     @CreateDateColumn({ type: Date })
     createdAt: Date
 }
