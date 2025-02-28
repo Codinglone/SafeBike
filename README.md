@@ -84,10 +84,10 @@ npm run build
 npm start
 ```
 
-# 📝 API Documentation
+### 📝 API Documentation
 http://localhost:5000/api-docs
 
-# 🔄 Workflow
+### 🔄 Workflow
 
 1. 👤 Passenger creates an account
 2. 🏍️ Rider creates an account
@@ -97,14 +97,14 @@ http://localhost:5000/api-docs
 6. 🏁 Rider marks delivery as completed
 7. ✅ Recipient confirms package receipt
 
-# 🧪 Testing
+### 🧪 Testing
 ```
 ## Run tests
 
 npm test
 ```
 
-# Run tests with coverage
+### Run tests with coverage
 ```
 npm run test:coverage
 
