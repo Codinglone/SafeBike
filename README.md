@@ -73,12 +73,12 @@ NODE_ENV=development
 
 4. **Start the server**
 
-## Development mode
+### Development mode
 ```
 npm run dev
 
 ```
-## Production mode
+### Production mode
 
 npm run build
 npm start
