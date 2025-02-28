@@ -7,6 +7,9 @@ export const app = fastify();
 const PORT = parseInt(process.env.PORT) || 5000;
 const path = require("path");
 const multer = require("fastify-multer");
+const BASE_URL = process.env.NODE_ENV === 'production' 
+    ? 'https://safebike.onrender.com'  // Updated production URL
+    : `http://localhost:${PORT}`;
 app.register(fastifySwagger, {
     mode: 'dynamic',
     openapi: {
@@ -17,9 +20,7 @@ app.register(fastifySwagger, {
         },
         servers: [
           {
-              url: process.env.NODE_ENV === 'production' 
-                  ? 'https://safebike-rwanda.onrender.com'
-                  : `http://localhost:${PORT}`,
+              url: BASE_URL,
               description: process.env.NODE_ENV === 'production' ? 'Production server' : 'Development server'
           }
       ],
@@ -40,6 +41,7 @@ app.register(fastifySwaggerUi, {
     uiConfig: {
         docExpansion: 'list',
         deepLinking: false,
+        persistAuthorization: true,
     },
     uiHooks: {
       onRequest: function (request, reply, next) {

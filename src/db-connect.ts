@@ -1,6 +1,6 @@
 import { AppDataSource } from "./data-source";
 
-export const connectDB = async (retries = 5) => {
+export const connectDB = async (retries = 3) => {
     while (retries) {
         try {
             await AppDataSource.initialize();
