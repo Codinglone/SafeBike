@@ -74,9 +74,8 @@ NODE_ENV=development
 4. **Start the server**
 
 ## Development mode
-bash```
-npm run dev
 ```
+npm run dev
 
 # Production mode
 ```
