@@ -73,7 +73,7 @@ NODE_ENV=development
 
 4. **Start the server**
 
-# Development mode
+## Development mode
 bash```
 npm run dev
 ```
@@ -99,7 +99,7 @@ http://localhost:5000/api-docs
 
 # 🧪 Testing
 ```
-# Run tests
+## Run tests
 
 npm test
 ```
