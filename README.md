@@ -115,5 +115,5 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 📞 Contact
 For any inquiries, please reach out to:
 
-Email: info@safebike.rw
-Twitter: @SafeBikeRwanda
+Email: niyokwizerwafabrice250@gmail.com
+Linkedin: NIYOKWIZERWA Fabrice
