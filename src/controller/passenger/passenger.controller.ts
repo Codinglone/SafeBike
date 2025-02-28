@@ -1,14 +1,25 @@
+import { FastifyRequest, FastifyReply } from "fastify";
 import { PassengerAccountCreationAPI } from "../../model/passenger.model";
+import { PassengerAccountCreationType } from "../../utility/interfaces";
 
-const createPassengerController = async (req, reply) => {
+export const createPassengerController = async (request: FastifyRequest, reply: FastifyReply) => {
   try {
-    const response = await PassengerAccountCreationAPI.createPassenger(
-      req.body
-    );
-    reply.code(201).send(response);
+    const { firstName, lastName, email, password, phoneNumber, ResidencyAddress } = request.body as PassengerAccountCreationType;
+
+    const newPassenger = await PassengerAccountCreationAPI.createPassenger({
+      firstName,
+      lastName,
+      email,
+      password,
+      phoneNumber,
+      ResidencyAddress
+    });
+
+    reply.code(201).send({
+      message: "Passenger account created successfully",
+      data: newPassenger
+    });
   } catch (err) {
-    reply.code(204).send(err);
+    reply.code(400).send({ error: err.message });
   }
 };
-
-export { createPassengerController };
