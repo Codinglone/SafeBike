@@ -75,6 +75,7 @@ app.register(require("@fastify/static"), {
 
 app.register(require("./routes/welcome.routes"), { prefix: "" });
 app.register(require("./routes/auth/auth.routes"), { prefix: "/api/v1" });
+app.register(require("./routes/package.routes"), { prefix: "/api/v1" });
 
 const start = async () => {
   try {
