@@ -52,11 +52,13 @@ SafeBike is a revolutionary API that connects passengers who need to send packag
 ```bash
 git clone https://github.com/your-username/safebike-rwanda.git
 cd safebike-rwanda
+```
 
 2. **Install dependencies**
 
 ```bash
 npm install
+```
 
 3. **Set up environment variables**
 
@@ -72,11 +74,15 @@ NODE_ENV=development
 4. **Start the server**
 
 # Development mode
+bash```
 npm run dev
+```
 
 # Production mode
+```
 npm run build
 npm start
+```
 
 # 📝 API Documentation
 http://localhost:5000/api-docs
@@ -94,10 +100,14 @@ http://localhost:5000/api-docs
 # 🧪 Testing
 
 # Run tests
+```
 npm test
+```
 
 # Run tests with coverage
+```
 npm run test:coverage
+```
 
 📄 License
 This project is licensed under the MIT License - see the LICENSE file for details.
