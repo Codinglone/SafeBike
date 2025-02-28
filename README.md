@@ -78,7 +78,7 @@ NODE_ENV=development
 npm run dev
 
 ```
-# Production mode
+## Production mode
 
 npm run build
 npm start
