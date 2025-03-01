@@ -84,6 +84,10 @@ export class PackageAPI {
             throw new Error("Package not found");
         }
 
+        if (!packageToDeliver.recipient){
+            packageToDeliver.recipient = null;
+        }
+        
         return packageToDeliver;
     }
 
