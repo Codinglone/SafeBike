@@ -107,7 +107,7 @@ export class PackageAPI {
 
   static async assignRider(
     packageId: number,
-    plateNumber: string
+    riderId: number
   ): Promise<Package> {
     const packageRepository = AppDataSource.getRepository(Package);
     const riderRepository = AppDataSource.getRepository(Rider);
@@ -126,7 +126,7 @@ export class PackageAPI {
     }
 
     const rider = await riderRepository.findOne({
-      where: { plateNumber },
+      where: { id: riderId },
     });
 
     if (!rider) {
@@ -140,24 +140,25 @@ export class PackageAPI {
   }
 
   // Add method to get available packages
-  static async getAvailablePackages(request: FastifyRequest, reply: FastifyReply) {
+  static async getAvailablePackages(){
     try {
+      console.log("Fetching available packages...");
       const packageRepository = AppDataSource.getRepository(Package);
       
-      // Query packages that have status "PENDING" (available for pickup)
-      const availablePackages = await packageRepository.find({
-        where: {
+      // Find packages that are pending and not assigned to any rider
+      const packages = await packageRepository.find({
+        where: { 
           status: PackageStatus.PENDING,
+          rider: null // Only get packages not assigned to any rider
         },
-        order: {
-          createdAt: "DESC"
-        }
+        order: { createdAt: "DESC" }
       });
       
-      return reply.code(200).send(availablePackages);
+      console.log(`Found ${packages.length} available packages`);
+      return packages;
     } catch (error) {
-      console.error("Error fetching available packages:", error);
-      return reply.code(500).send({ error: "Failed to fetch available packages" });
+      console.error("Error in getAvailablePackages:", error);
+      throw new Error(`Failed to fetch available packages: ${error.message}`);
     }
   }
 

@@ -108,31 +108,36 @@ export const getRiderPackagesController = async (req, reply) => {
 
 export const assignPackageController = async (
   request: FastifyRequest<{
-    Body: { plateNumber: string };
-    Params: AssignPackageParams;
+    Params: { packageId: string };
+    Body: { riderId?: number; plateNumber?: string; }
   }> &
     AuthenticatedRequest,
   reply: FastifyReply
 ) => {
   try {
-    if (!request.user || request.user.userType !== "rider") {
-      return reply.code(403).send({ error: "Only riders can accept packages" });
-    }
-
     const { packageId } = request.params;
-    const { plateNumber } = request.body;
-
-    const response = await PackageAPI.assignRider(
+    const riderId = request.user.id;
+    
+    // Log received data
+    console.log("Assign package request:", {
+      packageId,
+      riderId,
+      userId: request.user?.id
+    });
+    
+    // Let the assignment work without plateNumber
+    const result = await PackageAPI.assignRider(
       parseInt(packageId),
-      plateNumber
+      riderId
     );
-
-    reply.code(200).send({
+    
+    return reply.code(200).send({
       message: "Package assigned successfully",
-      data: response,
+      data: result
     });
   } catch (err) {
-    reply.code(400).send({ error: err.message });
+    console.error("Error assigning package:", err);
+    return reply.code(400).send({ error: err.message });
   }
 };
 
@@ -147,7 +152,7 @@ export const getAvailablePackagesController = async (
         .send({ error: "Only riders can view available packages" });
     }
 
-    const packages = await PackageAPI.getAvailablePackages(request, reply);
+    const packages = await PackageAPI.getAvailablePackages();
     reply.code(200).send({ data: packages });
   } catch (err) {
     reply.code(400).send({ error: err.message });

@@ -188,7 +188,7 @@ export const getRiderPackagesOpts = {
 };
 
 export const assignPackageSchema = T.Object({
-  plateNumber: T.String({ description: "Rider plate number" }),
+  riderId: T.String({ description: "Rider plate number" }),
   confirmPickup: T.Boolean({ default: false }),
 });
 
@@ -210,7 +210,7 @@ export const assignPackageOpts = {
             id: T.Number(),
             firstName: T.String(),
             lastName: T.String(),
-            plateNumber: T.String(),
+            // plateNumber: T.String(),
             phoneNumber: T.String(),
           }),
         }),
@@ -318,43 +318,45 @@ export const getPassengerPackagesOpts = {
 
 export const getAvailablePackagesOpts = {
   schema: {
-    response: {
-      200: {
-        type: 'array',
-        items: {
-          type: 'object',
-          properties: {
-            // Same properties as above
-            id: { type: 'number' },
-            recipientName: { type: 'string' },
-            recipientPhone: { type: 'string' },
-            recipientEmail: { type: 'string' },
-            pickupLocation: { type: 'string' },
-            deliveryLocation: { type: 'string' },
-            description: { type: 'string' },
-            estimatedValue: { type: 'number' },
-            status: { type: 'string' },
-            createdAt: { type: 'string', format: 'date-time' },
-            updatedAt: { type: 'string', format: 'date-time' }
-          }
-        }
-      }
-    }
+    // response: {
+    //   200: {
+    //     type: 'array',
+    //     items: {
+    //       type: 'object',
+    //       properties: {
+    //         // Same properties as above
+    //         id: { type: 'number' },
+    //         recipientName: { type: 'string' },
+    //         recipientPhone: { type: 'string' },
+    //         recipientEmail: { type: 'string' },
+    //         pickupLocation: { type: 'string' },
+    //         deliveryLocation: { type: 'string' },
+    //         description: { type: 'string' },
+    //         estimatedValue: { type: 'number' },
+    //         status: { type: 'string' },
+    //         createdAt: { type: 'string', format: 'date-time' },
+    //         updatedAt: { type: 'string', format: 'date-time' }
+    //       }
+    //     }
+    //   }
+    // }
   },
   handler: async (request, reply) => {
     try {
-      const availablePackages = await request.server.db.package.findMany({
-        where: { 
-          status: "PENDING", // Only get pending packages
-          riderId: null // That aren't assigned to a rider yet
-        },
-        orderBy: { createdAt: 'desc' }
-      });
+      if (!request.user || request.user.userType !== "rider") {
+        return reply
+          .code(403)
+          .send({ error: "Only riders can view available packages" });
+      }
+
+      // Import and use PackageAPI directly from model
+      const { PackageAPI } = require("../model/package.model");
+      const packages = await PackageAPI.getAvailablePackages();
       
-      return reply.code(200).send(availablePackages);
+      return reply.code(200).send({ data: packages });
     } catch (error) {
-      console.error("Error fetching available packages:", error);
-      return reply.code(500).send({ error: "Failed to fetch available packages" });
+      console.error("Error in schema handler:", error);
+      return reply.code(500).send({ error: error.message });
     }
   }
 };
