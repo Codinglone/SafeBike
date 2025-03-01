@@ -1,3 +1,4 @@
+import { FastifyReply, FastifyRequest } from "fastify";
 import { AppDataSource } from "../data-source";
 import { Package, PackageStatus } from "../entity/Package";
 import { Passenger } from "../entity/Passenger";
@@ -39,6 +40,7 @@ export class PackageAPI {
     return packageRepository.save(newPackage) as unknown as Promise<Package>;
   }
 
+  
   static async getAllPackages(): Promise<Package[]> {
     const packageRepository = AppDataSource.getRepository(Package);
     return await packageRepository.find({
@@ -101,17 +103,11 @@ export class PackageAPI {
     return packageToDeliver;
   }
 
-  static async getPackagesByPassenger(passengerId: number): Promise<Package[]> {
-    const packageRepository = AppDataSource.getRepository(Package);
-    return await packageRepository.find({
-      where: { sender: { id: passengerId } },
-      relations: ["rider"],
-    });
-  }
+
 
   static async assignRider(
     packageId: number,
-    plateNumber: string
+    riderId: number
   ): Promise<Package> {
     const packageRepository = AppDataSource.getRepository(Package);
     const riderRepository = AppDataSource.getRepository(Rider);
@@ -130,7 +126,7 @@ export class PackageAPI {
     }
 
     const rider = await riderRepository.findOne({
-      where: { plateNumber },
+      where: { id: riderId },
     });
 
     if (!rider) {
@@ -144,12 +140,59 @@ export class PackageAPI {
   }
 
   // Add method to get available packages
-  static async getAvailablePackages(): Promise<Package[]> {
-    const packageRepository = AppDataSource.getRepository(Package);
-    return packageRepository.find({
-      where: { status: PackageStatus.PENDING },
-      relations: ["sender"],
-    });
+  static async getAvailablePackages(){
+    try {
+      console.log("Fetching available packages...");
+      const packageRepository = AppDataSource.getRepository(Package);
+      
+      // Find packages that are pending and not assigned to any rider
+      const packages = await packageRepository.find({
+        where: { 
+          status: PackageStatus.PENDING,
+          rider: null // Only get packages not assigned to any rider
+        },
+        order: { createdAt: "DESC" }
+      });
+      
+      console.log(`Found ${packages.length} available packages`);
+      return packages;
+    } catch (error) {
+      console.error("Error in getAvailablePackages:", error);
+      throw new Error(`Failed to fetch available packages: ${error.message}`);
+    }
+  }
+
+  static async getRiderPackages(riderId: number) {
+    try {
+      console.log(`Fetching packages for rider: ${riderId}`);
+      
+      const packageRepository = AppDataSource.getRepository(Package);
+      const packages = await packageRepository.find({
+        where: { rider: { id: riderId } },
+        relations: ["sender", "recipient", "rider"],
+        order: { createdAt: "DESC" }
+      });
+      
+      // Map only the fields we need to send to frontend
+      return packages.map(pkg => ({
+        id: pkg.id,
+        recipientName: pkg.recipientName,
+        recipientPhone: pkg.recipientPhone,
+        pickupLocation: pkg.pickupLocation,
+        deliveryLocation: pkg.deliveryLocation,
+        description: pkg.description,
+        estimatedValue: pkg.estimatedValue,
+        status: pkg.status,
+        passengerId: pkg.sender?.id,
+        createdAt: pkg.createdAt,
+        updatedAt: pkg.updatedAt,
+        pickedUpAt: pkg.pickedUpAt,
+        deliveredAt: pkg.deliveredAt
+      }));
+    } catch (error) {
+      console.error("Error in getRiderPackages:", error);
+      throw new Error("Failed to fetch rider packages");
+    }
   }
 
   static async getPackagesByRider(riderId: number): Promise<Package[]> {
@@ -158,6 +201,22 @@ export class PackageAPI {
       where: { rider: { id: riderId } },
       relations: ["sender"],
     });
+  }
+
+  static  async getPackagesByPassenger (passengerId: number) {
+    try {
+      const packageRepository = AppDataSource.getRepository(Package);
+      
+      const packages = await packageRepository.find({
+        where: { sender: { id: passengerId } },
+        order: { createdAt: "DESC" }
+      });
+      
+      return packages;
+    } catch (error) {
+      console.error("Error fetching packages by passenger:", error);
+      throw new Error("Failed to fetch passenger packages");
+    }
   }
 
   static async confirmPickup(

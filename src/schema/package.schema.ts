@@ -11,14 +11,11 @@ import {
   confirmDeliveryController,
   getAllPackagesController
 } from "../controller/package.controller";
+import { PackageAPI } from "../model/package.model";
 
 export const createPackageSchema = T.Object({
   recipientName: T.String({ description: "Name of the package recipient" }),
   recipientPhone: T.String({ description: "Phone number of the recipient" }),
-  recipientEmail: T.String({
-    description: "Email of registered recipient passenger",
-    format: "email",
-  }),
   pickupLocation: T.String({ description: "Package pickup location" }),
   deliveryLocation: T.String({ description: "Package delivery location" }),
   description: T.String({ description: "Package description" }),
@@ -187,7 +184,7 @@ export const getRiderPackagesOpts = {
 };
 
 export const assignPackageSchema = T.Object({
-  plateNumber: T.String({ description: "Rider plate number" }),
+  riderId: T.String({ description: "Rider plate number" }),
   confirmPickup: T.Boolean({ default: false }),
 });
 
@@ -209,7 +206,7 @@ export const assignPackageOpts = {
             id: T.Number(),
             firstName: T.String(),
             lastName: T.String(),
-            plateNumber: T.String(),
+            // plateNumber: T.String(),
             phoneNumber: T.String(),
           }),
         }),
@@ -259,4 +256,103 @@ export const confirmDeliveryOpts = {
     },
   },
   handler: confirmDeliveryController,
+};
+
+export const getPassengerPackagesOpts = {
+  schema: {
+    response: {
+      200: {
+        type: 'object',
+        properties: {
+          data: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                id: { type: 'number' },
+                recipientName: { type: 'string' },
+                recipientPhone: { type: 'string' },
+                recipientEmail: { type: 'string' },
+                pickupLocation: { type: 'string' },
+                deliveryLocation: { type: 'string' },
+                description: { type: 'string' },
+                estimatedValue: { type: 'number' },
+                status: { type: 'string' },
+                passengerId: { type: 'number' },
+                riderId: { type: ['number', 'null'] },
+                createdAt: { type: 'string' },
+                updatedAt: { type: 'string' }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  handler: async (request, reply) => {
+    try {
+      if (!request.user || request.user.userType !== "passenger") {
+        return reply
+          .code(403)
+          .send({ error: "Only passengers can view their packages" });
+      }
+      
+      // Use your PackageAPI
+      const packages = await PackageAPI.getPackagesByPassenger(request.user.id);
+      
+      // Return data in the correct format matching your schema
+      return reply.code(200).send({ data: packages });
+    } catch (error) {
+      console.error("Error fetching passenger packages:", error);
+      return reply.code(500).send({ 
+        error: "Failed to fetch passenger packages",
+        message: error.message
+      });
+    }
+  }
+};
+
+export const getAvailablePackagesOpts = {
+  schema: {
+    // response: {
+    //   200: {
+    //     type: 'array',
+    //     items: {
+    //       type: 'object',
+    //       properties: {
+    //         // Same properties as above
+    //         id: { type: 'number' },
+    //         recipientName: { type: 'string' },
+    //         recipientPhone: { type: 'string' },
+    //         recipientEmail: { type: 'string' },
+    //         pickupLocation: { type: 'string' },
+    //         deliveryLocation: { type: 'string' },
+    //         description: { type: 'string' },
+    //         estimatedValue: { type: 'number' },
+    //         status: { type: 'string' },
+    //         createdAt: { type: 'string', format: 'date-time' },
+    //         updatedAt: { type: 'string', format: 'date-time' }
+    //       }
+    //     }
+    //   }
+    // }
+  },
+  handler: async (request, reply) => {
+    try {
+      if (!request.user || request.user.userType !== "rider") {
+        return reply
+          .code(403)
+          .send({ error: "Only riders can view available packages" });
+      }
+
+      // Import and use PackageAPI directly from model
+      const { PackageAPI } = require("../model/package.model");
+      const packages = await PackageAPI.getAvailablePackages();
+      
+      return reply.code(200).send({ data: packages });
+    } catch (error) {
+      console.error("Error in schema handler:", error);
+      return reply.code(500).send({ error: error.message });
+    }
+  }
 };

@@ -96,43 +96,62 @@ export const getPackageController = async (req, reply) => {
   }
 };
 
-export const getRiderPackagesController = async (req, reply) => {
+export const getRiderPackagesController = async (
+  request: AuthenticatedRequest,
+  reply: FastifyReply
+) => {
   try {
-    const riderId = req.user.id;
-    const response = await PackageAPI.getPackagesByRider(riderId);
-    reply.code(200).send({ packages: response });
+    if (!request.user || request.user.userType !== "rider") {
+      return reply
+        .code(403)
+        .send({ error: "Only riders can view their packages" });
+    }
+
+    const packages = await PackageAPI.getRiderPackages(request.user.id);
+    
+    // Send the raw packages without additional validation
+    return reply.code(200).send({ data: packages });
   } catch (err) {
-    reply.code(400).send({ error: err.message });
+    console.error("Error fetching rider packages:", err);
+    return reply.code(500).send({ 
+      error: "Failed to fetch rider packages",
+      message: err.message
+    });
   }
 };
 
 export const assignPackageController = async (
   request: FastifyRequest<{
-    Body: { plateNumber: string };
-    Params: AssignPackageParams;
+    Params: { packageId: string };
+    Body: { riderId?: number; plateNumber?: string; }
   }> &
     AuthenticatedRequest,
   reply: FastifyReply
 ) => {
   try {
-    if (!request.user || request.user.userType !== "rider") {
-      return reply.code(403).send({ error: "Only riders can accept packages" });
-    }
-
     const { packageId } = request.params;
-    const { plateNumber } = request.body;
-
-    const response = await PackageAPI.assignRider(
+    const riderId = request.user.id;
+    
+    // Log received data
+    console.log("Assign package request:", {
+      packageId,
+      riderId,
+      userId: request.user?.id
+    });
+    
+    // Let the assignment work without plateNumber
+    const result = await PackageAPI.assignRider(
       parseInt(packageId),
-      plateNumber
+      riderId
     );
-
-    reply.code(200).send({
+    
+    return reply.code(200).send({
       message: "Package assigned successfully",
-      data: response,
+      data: result
     });
   } catch (err) {
-    reply.code(400).send({ error: err.message });
+    console.error("Error assigning package:", err);
+    return reply.code(400).send({ error: err.message });
   }
 };
 
