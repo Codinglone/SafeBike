@@ -11,6 +11,7 @@ import {
   confirmDeliveryController,
   getAllPackagesController
 } from "../controller/package.controller";
+import { PackageAPI } from "../model/package.model";
 
 export const createPackageSchema = T.Object({
   recipientName: T.String({ description: "Name of the package recipient" }),
@@ -259,4 +260,101 @@ export const confirmDeliveryOpts = {
     },
   },
   handler: confirmDeliveryController,
+};
+
+export const getPassengerPackagesOpts = {
+  schema: {
+    response: {
+      200: {
+        type: 'object',
+        properties: {
+          data: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                id: { type: 'number' },
+                recipientName: { type: 'string' },
+                recipientPhone: { type: 'string' },
+                recipientEmail: { type: 'string' },
+                pickupLocation: { type: 'string' },
+                deliveryLocation: { type: 'string' },
+                description: { type: 'string' },
+                estimatedValue: { type: 'number' },
+                status: { type: 'string' },
+                passengerId: { type: 'number' },
+                riderId: { type: ['number', 'null'] },
+                createdAt: { type: 'string' },
+                updatedAt: { type: 'string' }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  handler: async (request, reply) => {
+    try {
+      if (!request.user || request.user.userType !== "passenger") {
+        return reply
+          .code(403)
+          .send({ error: "Only passengers can view their packages" });
+      }
+      
+      // Use your PackageAPI
+      const packages = await PackageAPI.getPackagesByPassenger(request.user.id);
+      
+      // Return data in the correct format matching your schema
+      return reply.code(200).send({ data: packages });
+    } catch (error) {
+      console.error("Error fetching passenger packages:", error);
+      return reply.code(500).send({ 
+        error: "Failed to fetch passenger packages",
+        message: error.message
+      });
+    }
+  }
+};
+
+export const getAvailablePackagesOpts = {
+  schema: {
+    response: {
+      200: {
+        type: 'array',
+        items: {
+          type: 'object',
+          properties: {
+            // Same properties as above
+            id: { type: 'number' },
+            recipientName: { type: 'string' },
+            recipientPhone: { type: 'string' },
+            recipientEmail: { type: 'string' },
+            pickupLocation: { type: 'string' },
+            deliveryLocation: { type: 'string' },
+            description: { type: 'string' },
+            estimatedValue: { type: 'number' },
+            status: { type: 'string' },
+            createdAt: { type: 'string', format: 'date-time' },
+            updatedAt: { type: 'string', format: 'date-time' }
+          }
+        }
+      }
+    }
+  },
+  handler: async (request, reply) => {
+    try {
+      const availablePackages = await request.server.db.package.findMany({
+        where: { 
+          status: "PENDING", // Only get pending packages
+          riderId: null // That aren't assigned to a rider yet
+        },
+        orderBy: { createdAt: 'desc' }
+      });
+      
+      return reply.code(200).send(availablePackages);
+    } catch (error) {
+      console.error("Error fetching available packages:", error);
+      return reply.code(500).send({ error: "Failed to fetch available packages" });
+    }
+  }
 };

@@ -147,7 +147,7 @@ export const getAvailablePackagesController = async (
         .send({ error: "Only riders can view available packages" });
     }
 
-    const packages = await PackageAPI.getAvailablePackages();
+    const packages = await PackageAPI.getAvailablePackages(request, reply);
     reply.code(200).send({ data: packages });
   } catch (err) {
     reply.code(400).send({ error: err.message });

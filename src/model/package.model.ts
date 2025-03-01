@@ -1,3 +1,4 @@
+import { FastifyReply, FastifyRequest } from "fastify";
 import { AppDataSource } from "../data-source";
 import { Package, PackageStatus } from "../entity/Package";
 import { Passenger } from "../entity/Passenger";
@@ -39,6 +40,7 @@ export class PackageAPI {
     return packageRepository.save(newPackage) as unknown as Promise<Package>;
   }
 
+  
   static async getAllPackages(): Promise<Package[]> {
     const packageRepository = AppDataSource.getRepository(Package);
     return await packageRepository.find({
@@ -101,13 +103,7 @@ export class PackageAPI {
     return packageToDeliver;
   }
 
-  static async getPackagesByPassenger(passengerId: number): Promise<Package[]> {
-    const packageRepository = AppDataSource.getRepository(Package);
-    return await packageRepository.find({
-      where: { sender: { id: passengerId } },
-      relations: ["rider"],
-    });
-  }
+
 
   static async assignRider(
     packageId: number,
@@ -144,12 +140,25 @@ export class PackageAPI {
   }
 
   // Add method to get available packages
-  static async getAvailablePackages(): Promise<Package[]> {
-    const packageRepository = AppDataSource.getRepository(Package);
-    return packageRepository.find({
-      where: { status: PackageStatus.PENDING },
-      relations: ["sender"],
-    });
+  static async getAvailablePackages(request: FastifyRequest, reply: FastifyReply) {
+    try {
+      const packageRepository = AppDataSource.getRepository(Package);
+      
+      // Query packages that have status "PENDING" (available for pickup)
+      const availablePackages = await packageRepository.find({
+        where: {
+          status: PackageStatus.PENDING,
+        },
+        order: {
+          createdAt: "DESC"
+        }
+      });
+      
+      return reply.code(200).send(availablePackages);
+    } catch (error) {
+      console.error("Error fetching available packages:", error);
+      return reply.code(500).send({ error: "Failed to fetch available packages" });
+    }
   }
 
   static async getPackagesByRider(riderId: number): Promise<Package[]> {
@@ -158,6 +167,22 @@ export class PackageAPI {
       where: { rider: { id: riderId } },
       relations: ["sender"],
     });
+  }
+
+  static  async getPackagesByPassenger (passengerId: number) {
+    try {
+      const packageRepository = AppDataSource.getRepository(Package);
+      
+      const packages = await packageRepository.find({
+        where: { sender: { id: passengerId } },
+        order: { createdAt: "DESC" }
+      });
+      
+      return packages;
+    } catch (error) {
+      console.error("Error fetching packages by passenger:", error);
+      throw new Error("Failed to fetch passenger packages");
+    }
   }
 
   static async confirmPickup(
