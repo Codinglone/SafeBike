@@ -1,5 +1,5 @@
 import { Type as T } from "@sinclair/typebox";
-import { createPassengerController } from "../controller/passenger/passenger.controller";
+import { createPassengerController, getAllPassengersController } from "../controller/passenger/passenger.controller";
 
 export const passengerSchema = T.Object({
   firstName: T.String({ description: 'Passenger first name' }),
@@ -26,4 +26,26 @@ export const postPassengerOpts = {
       }
   },
   handler: createPassengerController
+};
+
+export const getAllPassengersOpts = {
+  schema: {
+    tags: ["passengers"],
+    description: "Get all passengers",
+    response: {
+      200: T.Object({
+        data: T.Array(
+          T.Object({
+            id: T.Number(),
+            firstName: T.String(),
+            lastName: T.String(),
+            email: T.String(),
+            phoneNumber: T.String(),
+            createdAt: T.String(),
+          })
+        )
+      })
+    }
+  },
+  handler: getAllPassengersController
 };

@@ -9,24 +9,27 @@ export interface AuthenticatedRequest extends FastifyRequest {
     };
 }
 
-export const isAdmin = async (
-    request: FastifyRequest & AuthenticatedRequest,
-    reply: FastifyReply
-  ) => {
-    try {
-      // Check if user is authenticated
-      await authenticateToken(request, reply);
-      
-      // Check if authenticated user is an admin
-      if (!request.user || request.user.userType !== 'admin') {
-        return reply.code(403).send({
-          error: "Access denied. Only administrators can access this resource."
-        });
-      }
-    } catch (err) {
-      reply.code(401).send({ error: "Authentication failed" });
+export const isAdmin = async (request, reply, done) => {
+  try {
+    // First, authenticate the token
+    await authenticateToken(request, reply);
+    
+    // Log for debugging
+    console.log("User type from token:", request.user?.userType);
+    
+    // Check if authenticated user is an admin
+    if (!request.user || request.user.userType !== 'admin') {
+      return reply.code(403).send({
+        error: "Access denied. Only administrators can access this resource."
+      });
     }
-  };
+    
+    done();
+  } catch (err) {
+    // If authenticateToken already sent a response, this won't execute
+    return reply.code(401).send({ error: "Authentication failed" });
+  }
+};
 
 export const authenticateToken = async (request: AuthenticatedRequest, reply: FastifyReply) => {
     try {
