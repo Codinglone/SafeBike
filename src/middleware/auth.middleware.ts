@@ -1,13 +1,32 @@
 import { FastifyRequest, FastifyReply } from "fastify";
 const jwt = require('jsonwebtoken');
 
-interface AuthenticatedRequest extends FastifyRequest {
+export interface AuthenticatedRequest extends FastifyRequest {
     user?: {
         id: number;
         email: string;
-        userType: 'passenger' | 'rider';
+        userType: 'passenger' | 'rider' | 'admin';
     };
 }
+
+export const isAdmin = async (
+    request: FastifyRequest & AuthenticatedRequest,
+    reply: FastifyReply
+  ) => {
+    try {
+      // Check if user is authenticated
+      await authenticateToken(request, reply);
+      
+      // Check if authenticated user is an admin
+      if (!request.user || request.user.userType !== 'admin') {
+        return reply.code(403).send({
+          error: "Access denied. Only administrators can access this resource."
+        });
+      }
+    } catch (err) {
+      reply.code(401).send({ error: "Authentication failed" });
+    }
+  };
 
 export const authenticateToken = async (request: AuthenticatedRequest, reply: FastifyReply) => {
     try {

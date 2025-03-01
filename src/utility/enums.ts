@@ -9,3 +9,9 @@ export enum safeBikeRoutes {
     GET_RIDER_PACKAGES = "/packages/rider",
     GET_MY_PACKAGES = "/packages/my"
 }
+
+export enum UserType {
+    PASSENGER = "passenger",
+    RIDER = "rider",
+    ADMIN = "admin"
+  }

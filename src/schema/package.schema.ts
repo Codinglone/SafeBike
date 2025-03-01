@@ -26,6 +26,21 @@ export const createPackageSchema = T.Object({
   }),
 });
 
+export const packageResponseSchema = T.Object({
+    recipientName: T.String({ description: "Name of the package recipient" }),
+    recipientPhone: T.String({ description: "Phone number of the recipient" }),
+    recipientEmail: T.Optional(T.String({
+      description: "Email of registered recipient passenger",
+      format: "email",
+    })),
+    pickupLocation: T.String({ description: "Package pickup location" }),
+    deliveryLocation: T.String({ description: "Package delivery location" }),
+    description: T.String({ description: "Package description" }),
+    estimatedValue: T.Number({
+      description: "Estimated value of the package in RWF",
+    }),
+  });
+
 export const updatePackageStatusSchema = T.Object({
   status: T.Enum(PackageStatus),
 });
@@ -63,7 +78,7 @@ export const createPackageOpts = {
         message: T.String(),
         data: T.Object({
           id: T.Number(),
-          ...createPackageSchema.properties,
+          ...packageResponseSchema.properties,
           status: T.Enum(PackageStatus),
           createdAt: T.String(),
         }),
@@ -105,7 +120,7 @@ export const getPackageOpts = {
       200: T.Object({
         data: T.Object({
           id: T.Number(),
-          ...createPackageSchema.properties,
+          ...packageResponseSchema.properties,
           status: T.Enum(PackageStatus),
           createdAt: T.String(),
           rider: T.Optional(
