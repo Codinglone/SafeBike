@@ -1,5 +1,5 @@
 import { Type as T } from "@sinclair/typebox";
-import { createRiderController, getAllRidersController } from "../controller/rider/rider.controller";
+import { createRiderController, getAllRidersController, updateAvailabilityController } from "../controller/rider/rider.controller";
 
 export const riderSchema = T.Object({
     firstName: T.String(),
@@ -10,6 +10,36 @@ export const riderSchema = T.Object({
     ResidencyAddress: T.String(),
     phoneNumber: T.String(),
 })
+
+export const updateAvailabilitySchema = T.Object({
+  isAvailable: T.Boolean({ description: 'Rider availability status' })
+});
+
+export const updateAvailabilityOpts = {
+  schema: {
+    tags: ['riders'],
+    description: 'Update rider availability status',
+    body: updateAvailabilitySchema,
+    response: {
+      200: T.Object({
+        message: T.String(),
+        data: T.Object({
+          id: T.Number(),
+          firstName: T.String(),
+          lastName: T.String(),
+          isAvailable: T.Boolean()
+        })
+      }),
+      400: T.Object({
+        error: T.String()
+      }),
+      403: T.Object({
+        error: T.String()
+      })
+    }
+  },
+  handler: updateAvailabilityController
+};
 
 export const postRiderOpts = {
     schema: {

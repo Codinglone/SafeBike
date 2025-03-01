@@ -28,4 +28,21 @@ export class RiderAccountCreationAPI {
       order: { createdAt: "DESC" },
     });
   }
+
+  static async updateAvailability(riderId: number, isAvailable: boolean): Promise<Rider> {
+    const riderRepository = AppDataSource.getRepository(Rider);
+    
+    const rider = await riderRepository.findOne({
+      where: { id: riderId }
+    });
+
+    if (!rider) {
+      throw new Error("Rider not found");
+    }
+
+    rider.isAvailable = isAvailable;
+    rider.lastLocationUpdate = new Date();
+
+    return await riderRepository.save(rider);
+  }
 }
