@@ -4,6 +4,7 @@ import { DataSource } from "typeorm";
 import { Passenger } from "./entity/Passenger";
 import { Rider } from "./entity/Rider";
 import { Package } from "./entity/Package";
+import { Admin } from "./entity/Admin";
 
 export const AppDataSource = new DataSource({
   type: "postgres",
@@ -28,7 +29,7 @@ export const AppDataSource = new DataSource({
       }),
   synchronize: true,
   logging: process.env.NODE_ENV === "development",
-  entities: [Passenger, Rider, Package],
+  entities: [Passenger, Rider, Package, Admin],
   migrations: [],
   subscribers: []
 });
