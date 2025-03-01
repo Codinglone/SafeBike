@@ -16,10 +16,6 @@ import { PackageAPI } from "../model/package.model";
 export const createPackageSchema = T.Object({
   recipientName: T.String({ description: "Name of the package recipient" }),
   recipientPhone: T.String({ description: "Phone number of the recipient" }),
-  recipientEmail: T.String({
-    description: "Email of registered recipient passenger",
-    format: "email",
-  }),
   pickupLocation: T.String({ description: "Package pickup location" }),
   deliveryLocation: T.String({ description: "Package delivery location" }),
   description: T.String({ description: "Package description" }),

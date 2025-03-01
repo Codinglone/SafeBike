@@ -162,6 +162,39 @@ export class PackageAPI {
     }
   }
 
+  static async getRiderPackages(riderId: number) {
+    try {
+      console.log(`Fetching packages for rider: ${riderId}`);
+      
+      const packageRepository = AppDataSource.getRepository(Package);
+      const packages = await packageRepository.find({
+        where: { rider: { id: riderId } },
+        relations: ["sender", "recipient", "rider"],
+        order: { createdAt: "DESC" }
+      });
+      
+      // Map only the fields we need to send to frontend
+      return packages.map(pkg => ({
+        id: pkg.id,
+        recipientName: pkg.recipientName,
+        recipientPhone: pkg.recipientPhone,
+        pickupLocation: pkg.pickupLocation,
+        deliveryLocation: pkg.deliveryLocation,
+        description: pkg.description,
+        estimatedValue: pkg.estimatedValue,
+        status: pkg.status,
+        passengerId: pkg.sender?.id,
+        createdAt: pkg.createdAt,
+        updatedAt: pkg.updatedAt,
+        pickedUpAt: pkg.pickedUpAt,
+        deliveredAt: pkg.deliveredAt
+      }));
+    } catch (error) {
+      console.error("Error in getRiderPackages:", error);
+      throw new Error("Failed to fetch rider packages");
+    }
+  }
+
   static async getPackagesByRider(riderId: number): Promise<Package[]> {
     const packageRepository = AppDataSource.getRepository(Package);
     return await packageRepository.find({

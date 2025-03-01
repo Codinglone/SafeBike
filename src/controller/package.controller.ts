@@ -96,13 +96,27 @@ export const getPackageController = async (req, reply) => {
   }
 };
 
-export const getRiderPackagesController = async (req, reply) => {
+export const getRiderPackagesController = async (
+  request: AuthenticatedRequest,
+  reply: FastifyReply
+) => {
   try {
-    const riderId = req.user.id;
-    const response = await PackageAPI.getPackagesByRider(riderId);
-    reply.code(200).send({ packages: response });
+    if (!request.user || request.user.userType !== "rider") {
+      return reply
+        .code(403)
+        .send({ error: "Only riders can view their packages" });
+    }
+
+    const packages = await PackageAPI.getRiderPackages(request.user.id);
+    
+    // Send the raw packages without additional validation
+    return reply.code(200).send({ data: packages });
   } catch (err) {
-    reply.code(400).send({ error: err.message });
+    console.error("Error fetching rider packages:", err);
+    return reply.code(500).send({ 
+      error: "Failed to fetch rider packages",
+      message: err.message
+    });
   }
 };
 
