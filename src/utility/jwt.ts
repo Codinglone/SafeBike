@@ -1,21 +1,18 @@
-require('dotenv').config();
-const jwt = require('jsonwebtoken'); 
-const JWT_SECRET = process.env.JWT_SECRET;
+import * as jwt from 'jsonwebtoken';
 
+// Update this interface to include 'admin' type
 interface TokenPayload {
-    id: number;
-    email: string;
-    userType: 'passenger' | 'rider' | 'admin';
+  id: number;
+  email: string;
+  userType: 'passenger' | 'rider' | 'admin'; // Add 'admin' here
 }
 
 export const generateToken = (payload: TokenPayload): string => {
-    return jwt.sign(payload, JWT_SECRET, { expiresIn: '24h' });
+  return jwt.sign(payload, process.env.JWT_SECRET || 'codextreme', {
+    expiresIn: '7d'
+  });
 };
 
 export const verifyToken = (token: string): TokenPayload => {
-    try {
-        return jwt.verify(token, JWT_SECRET) as TokenPayload;
-    } catch (error) {
-        throw new Error('Invalid token');
-    }
+  return jwt.verify(token, process.env.JWT_SECRET || 'codextreme') as TokenPayload;
 };

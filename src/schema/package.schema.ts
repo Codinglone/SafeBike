@@ -9,6 +9,7 @@ import {
   confirmPickupController,
   confirmDeliveryReceiptController,
   confirmDeliveryController,
+  getAllPackagesController
 } from "../controller/package.controller";
 
 export const createPackageSchema = T.Object({
@@ -136,6 +137,33 @@ export const getPackageOpts = {
     },
   },
   handler: getPackageController,
+};
+
+export const getAllPackagesOpts = {
+  schema: {
+    tags: ["packages"],
+    description: "Get all packages",
+    response: {
+      200: T.Object({
+        data: T.Array(
+          T.Object({
+            id: T.Number(),
+            status: T.Enum(PackageStatus),
+            recipientName: T.String(),
+            recipientPhone: T.String(),
+            recipientEmail: T.Optional(T.String()),
+            pickupLocation: T.String(),
+            deliveryLocation: T.String(),
+            description: T.String(),
+            estimatedValue: T.Number(),
+            createdAt: T.String(),
+            updatedAt: T.String()
+          })
+        )
+      })
+    }
+  },
+  handler: getAllPackagesController
 };
 
 export const getRiderPackagesOpts = {

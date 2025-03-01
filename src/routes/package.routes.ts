@@ -7,13 +7,14 @@ import {
   confirmPickupOpts,
   confirmDeliveryOpts,
   confirmDeliveryReceiptOpts,
+  getAllPackagesOpts
 } from "../schema/package.schema";
 import { safeBikeRoutes } from "../utility/enums";
-import { authenticateToken } from "../middleware/auth.middleware";
+import { authenticateToken, isAdmin } from "../middleware/auth.middleware";
 
 const PackageRoutes = (fastify, options, done) => {
   fastify.addHook("preHandler", authenticateToken);
-
+  fastify.get("/packages", getAllPackagesOpts);
   fastify.post(safeBikeRoutes.CREATE_PACKAGE, createPackageOpts);
   fastify.put(safeBikeRoutes.UPDATE_PACKAGE_STATUS, updatePackageStatusOpts);
   fastify.get(safeBikeRoutes.GET_PACKAGE, getPackageOpts);

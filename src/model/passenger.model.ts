@@ -23,4 +23,14 @@ export class PassengerAccountCreationAPI {
       throw new Error(`${payload.email} already exists!, use different email!`);
     }
   }
+
+  static async getAllPassengers(): Promise<Passenger[]> {
+    const passengerRepository = AppDataSource.getRepository(Passenger);
+    return await passengerRepository.find({
+      order: { createdAt: 'DESC' }
+    });
+  }
+  
 }
+
+
